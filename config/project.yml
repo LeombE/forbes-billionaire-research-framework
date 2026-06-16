@@ -1,0 +1,17 @@
+canonical_year: 2026
+canonical_source: "Forbes World's Billionaires annual list"
+canonical_source_policy:
+  annual_list_is_canonical: true
+  real_time_is_canonical: false
+  blocked_access_fallback: manual_import
+comparison_sources:
+  - name: "Forbes Real-Time Billionaires"
+    status: optional_separate_comparison_only
+    output: "data/processed/2026/forbes_realtime_comparison_june_2026.csv"
+outputs:
+  processed_dir: "data/processed/2026"
+  interim_dir: "data/interim/2026"
+  raw_forbes_dir: "data/raw/forbes/2026"
+  annual_reports_dir: "reports/annual/2026"
+  charts_dir: "reports/charts/2026"
+  people_reports_dir: "reports/people/2026"

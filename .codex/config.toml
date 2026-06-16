@@ -1,0 +1,10 @@
+# .codex/config.toml
+# Project-scoped Codex settings for the Forbes billionaire research project.
+
+project_doc_fallback_filenames = ["TEAM_GUIDE.md", ".agents.md"]
+project_doc_max_bytes = 65536
+
+[agents]
+max_threads = 6
+max_depth = 1
+job_max_runtime_seconds = 3600

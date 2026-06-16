@@ -1,0 +1,66 @@
+.venv/
+.pytest_cache/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+~$*
+~$*.docx
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+desktop.ini
+.env
+*.env
+.env.*
+
+# Prompt-pack install leftovers.
+forbes_billionaire_codex_prompt_pack/
+copy_into_repo/
+
+# GitHub-safe publication mode:
+# keep code, docs, blank templates, and synthetic samples public; keep Forbes
+# raw data, populated annual datasets, derived workbooks, charts, and generated
+# reports local unless explicit redistribution permission exists.
+data/raw/forbes_billionaires_*.json
+data/raw/forbes_billionaires_*_error.txt
+data/raw/forbes/*/forbes_billionaires_*.json
+data/raw/forbes/*/forbes_billionaires_*_error.txt
+data/raw/forbes/*/forbes_robots.txt
+data/raw/forbes_robots.txt
+data/raw/successful_years.csv
+data/raw/forbes/**
+data/raw/manual_top100_20??.csv
+data/raw/manual_billionaire_wealth_history_long.csv
+data/raw/manual_source_citations.csv
+
+# Processed Forbes-derived outputs and workbooks.
+data/processed/*.csv
+data/processed/**/*.csv
+Forbes_top100_*_analysis.xlsx
+*.xlsx
+
+# Interim evidence and migration artifacts that can contain Forbes-derived
+# values, report evidence, or local machine state.
+data/interim/enriched_evidence_registry*.csv
+data/interim/*/enriched_evidence_registry*.csv
+data/interim/ranks_*_evidence_pack.csv
+data/interim/*_baseline_hashes.csv
+data/interim/2026_migration_2025_baseline_hashes.csv
+
+# Generated reports and charts.
+reports/people/*.docx
+reports/people/**/*.docx
+reports/charts/*.png
+reports/charts/**/*.png
+reports/annual/**
+reports/executive_summary.md
+reports/insight_report.md
+streamlit_stdout.log
+streamlit_stderr.log
+
+# Local raw data and downloaded source files - never commit
+/data/raw/**

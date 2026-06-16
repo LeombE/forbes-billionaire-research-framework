@@ -1,0 +1,2 @@
+rank_2025,name,net_worth_2025_usd_b,age_2025,country_or_territory,source_of_wealth,industry,primary_company_or_asset,self_made_or_inherited_if_available,forbes_profile_url,canonical_source_url,notes,source_id,entered_by,entered_at,quality_flag
+1,Example Name - replace with Forbes annual-list value,0.0,,,,,,,,,Example row only; delete before production.,SRC_FORBES_2025_001,,2026-06-10,manual_example_delete
