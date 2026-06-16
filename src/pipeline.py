@@ -226,6 +226,7 @@ def run_pipeline(
     force_fetch: bool = False,
     offline: bool = False,
     manual: bool = False,
+    manual_import_dir: str | Path | None = None,
     init_year: bool = False,
 ) -> dict[str, object]:
     config = get_year_config(year)
@@ -244,11 +245,12 @@ def run_pipeline(
     robots_note = "Manual/offline mode; robots.txt was not fetched during this run."
 
     if manual:
-        top100, history_long = load_manual_inputs(config.year)
+        top100, history_long = load_manual_inputs(config.year, manual_import_dir=manual_import_dir)
         if top100.empty or history_long.empty:
+            manual_source = Path(manual_import_dir) if manual_import_dir is not None else Path("templates")
             raise RuntimeError(
-                f"Manual import templates for {config.year} are present but empty. Fill the official Forbes annual-list "
-                "manual-import files before running the pipeline in manual mode."
+                f"Manual import files for {config.year} are present but empty in {manual_source}. Fill official "
+                "Forbes annual-list manual-import files before running the pipeline in manual mode."
             )
         if "_classification_text" not in top100.columns:
             top100["_classification_text"] = ""
@@ -271,10 +273,12 @@ def run_pipeline(
 
     metrics = calculate_growth_metrics(top100_for_metrics, history_long, successful_years, config)
     if manual:
-        manual_citations = load_manual_citations(config.year)
+        manual_citations = load_manual_citations(config.year, manual_import_dir=manual_import_dir)
         if manual_citations is None or manual_citations.empty:
+            manual_source = Path(manual_import_dir) if manual_import_dir is not None else Path("templates")
             raise RuntimeError(
-                f"Manual mode for {config.year} requires a filled manual source citation file; blank templates are not enough."
+                f"Manual mode for {config.year} requires a filled manual source citation file in {manual_source}; "
+                "blank templates are not enough."
             )
         source_citations = manual_citations
     else:
@@ -330,6 +334,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--force-fetch", action="store_true", help="Refetch Forbes annual JSON even if raw cache exists.")
     parser.add_argument("--offline", action="store_true", help="Use cached Forbes annual JSON files; do not fetch.")
     parser.add_argument("--manual", "--manual-import", action="store_true", help="Use year-specific manual CSV inputs.")
+    parser.add_argument(
+        "--manual-import-dir",
+        type=Path,
+        default=None,
+        help="Read manual-import CSVs from a private local directory instead of public templates/.",
+    )
     parser.add_argument("--init-year", action="store_true", help="Create year directories and manual-import templates only.")
     return parser.parse_args()
 
@@ -341,6 +351,7 @@ def main() -> None:
         force_fetch=args.force_fetch,
         offline=args.offline,
         manual=args.manual,
+        manual_import_dir=args.manual_import_dir,
         init_year=args.init_year,
     )
     print("Pipeline complete")

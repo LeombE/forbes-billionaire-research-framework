@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pandas as pd
 
 from .config import (
@@ -79,6 +81,24 @@ def _template_paths(config: YearConfig) -> dict[str, Path]:
     }
 
 
+def _manual_input_paths(config: YearConfig, manual_import_dir: str | Path | None = None) -> dict[str, Path]:
+    """Return manual input file paths, optionally from a private local directory."""
+    if manual_import_dir is None:
+        paths = _template_paths(config)
+        return {
+            "top100_input": paths["top100_input"],
+            "history_input": paths["history_input"],
+            "citations_input": paths["citations_input"],
+        }
+
+    directory = Path(manual_import_dir)
+    return {
+        "top100_input": directory / f"manual_import_top100_{config.year}.csv",
+        "history_input": directory / f"manual_import_wealth_history_{config.year}.csv",
+        "citations_input": directory / f"manual_import_source_citations_{config.year}.csv",
+    }
+
+
 def write_manual_import_templates(year: int = 2025) -> dict[str, Path]:
     """Create blank manual-import templates with the required schema."""
     ensure_project_dirs()
@@ -96,18 +116,21 @@ def write_manual_import_templates(year: int = 2025) -> dict[str, Path]:
     return paths
 
 
-def manual_inputs_available(year: int = 2025) -> bool:
+def manual_inputs_available(year: int = 2025, manual_import_dir: str | Path | None = None) -> bool:
     """Return True when both manual input files exist."""
     config = get_year_config(year)
-    paths = _template_paths(config)
+    paths = _manual_input_paths(config, manual_import_dir)
     return paths["top100_input"].exists() and paths["history_input"].exists()
 
 
-def load_manual_inputs(year: int = 2025) -> tuple[pd.DataFrame, pd.DataFrame]:
+def load_manual_inputs(
+    year: int = 2025,
+    manual_import_dir: str | Path | None = None,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Load user-provided manual top-100 and wealth-history files."""
     config = get_year_config(year)
-    paths = _template_paths(config)
-    if not manual_inputs_available(year):
+    paths = _manual_input_paths(config, manual_import_dir)
+    if not manual_inputs_available(year, manual_import_dir):
         raise FileNotFoundError(
             f"Manual mode requires {paths['top100_input']} and {paths['history_input']}. "
             "Blank templates have been created; fill them with official annual-list values and citations."
@@ -115,9 +138,12 @@ def load_manual_inputs(year: int = 2025) -> tuple[pd.DataFrame, pd.DataFrame]:
     return pd.read_csv(paths["top100_input"]), pd.read_csv(paths["history_input"])
 
 
-def load_manual_citations(year: int = 2025) -> pd.DataFrame | None:
+def load_manual_citations(
+    year: int = 2025,
+    manual_import_dir: str | Path | None = None,
+) -> pd.DataFrame | None:
     """Load optional user-provided manual citation rows."""
-    paths = _template_paths(get_year_config(year))
+    paths = _manual_input_paths(get_year_config(year), manual_import_dir)
     if not paths["citations_input"].exists():
         return None
     return pd.read_csv(paths["citations_input"])

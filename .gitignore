@@ -34,6 +34,7 @@ tools/validate_*_pack.py
 # reports local unless explicit redistribution permission exists.
 data/raw/forbes_billionaires_*.json
 data/raw/forbes_billionaires_*_error.txt
+data/raw/forbes/2026/**
 data/raw/forbes/*/forbes_billionaires_*.json
 data/raw/forbes/*/forbes_billionaires_*_error.txt
 data/raw/forbes/*/forbes_robots.txt
@@ -46,7 +47,9 @@ data/raw/manual_source_citations.csv
 
 # Processed Forbes-derived outputs and workbooks.
 data/processed/*.csv
+data/processed/2026/**
 data/processed/**/*.csv
+Forbes_top100_2026_analysis.xlsx
 Forbes_top100_*_analysis.xlsx
 *.xlsx
 
@@ -60,8 +63,10 @@ data/interim/2026_migration_2025_baseline_hashes.csv
 
 # Generated reports and charts.
 reports/people/*.docx
+reports/people/2026/*.docx
 reports/people/**/*.docx
 reports/charts/*.png
+reports/charts/2026/*.png
 reports/charts/**/*.png
 reports/annual/**
 reports/executive_summary.md
@@ -71,3 +76,4 @@ streamlit_stderr.log
 
 # Local raw data and downloaded source files - never commit
 /data/raw/**
+data/private/**
