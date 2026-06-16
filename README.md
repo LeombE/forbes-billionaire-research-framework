@@ -16,6 +16,12 @@ This repository is configured to publish code, documentation, blank manual-impor
 
 Synthetic examples live under `samples/` and use fake people, fake companies, fake URLs, and source notes. They demonstrate schema shape only and are not Forbes data.
 
+## License
+
+This repository is released under the MIT License for the project code, documentation, blank templates, and synthetic sample files only.
+
+Forbes data, third-party source data, generated Forbes-derived datasets, generated Excel workbooks, generated charts, generated DOCX reports, and user-provided annual datasets are not included in this license grant. Bring your own legally usable source data before running the pipeline.
+
 ## Setup
 
 ```powershell
