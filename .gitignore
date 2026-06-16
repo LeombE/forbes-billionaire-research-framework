@@ -17,9 +17,16 @@ desktop.ini
 *.env
 .env.*
 
-# Prompt-pack install leftovers.
-forbes_billionaire_codex_prompt_pack/
+# Local assistant/project-instruction files.
+.codex/
+.agents/
+AGENTS.md
+prompts/
+
+# Local scaffolding leftovers.
+forbes_billionaire_*_pack/
 copy_into_repo/
+tools/validate_*_pack.py
 
 # GitHub-safe publication mode:
 # keep code, docs, blank templates, and synthetic samples public; keep Forbes

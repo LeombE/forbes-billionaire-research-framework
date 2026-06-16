@@ -30,13 +30,6 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Codex desktop fallback Python path used in this environment:
-
-```powershell
-& "C:\Users\Admin\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" -m venv .venv
-& ".\.venv\Scripts\python.exe" -m pip install -r requirements.txt
-```
-
 ## Annual Workflow
 
 The current default target year in Python entrypoints is 2026. Use `--year 2025` only for explicit legacy maintenance; preserved 2025 flat outputs are not regenerated during 2026 migration work.

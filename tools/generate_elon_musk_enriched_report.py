@@ -820,7 +820,7 @@ def create_report() -> dict[str, object]:
     add_appendices(doc)
     doc.core_properties.title = "Elon Musk Business Empire Analysis - Enriched"
     doc.core_properties.subject = "Forbes Top 100 Billionaires 2025 enriched sample report"
-    doc.core_properties.author = "Codex research pipeline"
+    doc.core_properties.author = "Forbes research pipeline"
     PEOPLE_DIR.mkdir(parents=True, exist_ok=True)
     doc.save(OUTPUT)
 

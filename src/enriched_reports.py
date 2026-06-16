@@ -93,7 +93,7 @@ REPORT_STATUS_VALUES = [
     "enriched_draft",
     "enriched_v2",
     "enriched_v3",
-    "AGENTS_grade_candidate",
+    "research_grade_candidate",
     "final_review_ready",
 ]
 
@@ -162,8 +162,8 @@ def infer_report_status(path: Path) -> str:
     name = path.name.casefold()
     if "final_review_ready" in name:
         return "final_review_ready"
-    if "agents_grade_candidate" in name or "agents-grade-candidate" in name:
-        return "AGENTS_grade_candidate"
+    if "research_grade_candidate" in name or "research-grade-candidate" in name:
+        return "research_grade_candidate"
     if "enriched_v3" in name:
         return "enriched_v3"
     if "enriched_v2" in name:
@@ -2912,7 +2912,7 @@ def add_generic_future_sections(doc: Document, context: EnrichedContext, evidenc
         "Generic lesson draft: durable billionaire wealth usually reflects concentrated ownership of scarce assets, favorable industry structure, capital allocation, and timing. "
         "The final version should translate the specific person's evidence into repeatable lessons without copying superficial biography.",
     )
-    add_confidence_note(doc, "Medium-low", "Reusable synthesis requires person-specific upgrade before AGENTS-grade publication.", evidence_keys)
+    add_confidence_note(doc, "Medium-low", "Reusable synthesis requires person-specific upgrade before research-grade publication.", evidence_keys)
 
 
 def add_appendices(doc: Document, evidence: list[EvidenceItem]) -> None:
@@ -3055,7 +3055,7 @@ def create_enriched_report(
 
     doc.core_properties.title = f"{context.person['name']} Business Empire Analysis - {variant}"
     doc.core_properties.subject = f"Forbes Top 100 Billionaires {config.year} enriched business empire report"
-    doc.core_properties.author = "Codex research pipeline"
+    doc.core_properties.author = "Forbes research pipeline"
     doc.save(output_path)
     return output_path
 

@@ -1,52 +1,72 @@
-# Install Guide — Forbes Billionaire Codex Prompt Pack
+# Install Guide
 
-This pack is designed for your existing `fobes top 100` / Forbes Top 100 project folder.
+This project is a Python research framework for annual Forbes World's Billionaires Top 100 analysis. Public releases include code, documentation, blank manual-import templates, and synthetic sample data only.
 
-## What to copy
-Copy everything inside `copy_into_repo/` into the root of your project repository, next to files like `app.py`, `README.md`, `requirements.txt`, `/src`, `/data`, and `/reports`.
+## Requirements
 
-After copying, your repo should contain:
+- Python 3.11 or newer
+- Windows PowerShell, macOS Terminal, or a compatible shell
+- Source data that you are legally allowed to use
 
-```text
-AGENTS.md
-.codex/config.toml
-.codex/agents/*.toml
-.agents/skills/*/SKILL.md
-prompts/*.md
-templates/*.md
-templates/manual_import_top100_2025_template.csv
-tools/validate_prompt_pack.py
-```
+## Create a Virtual Environment
 
-## Windows PowerShell copy example
-From the folder where you extracted this pack:
+Windows PowerShell:
 
 ```powershell
-$Repo = "C:\Users\<YOU>\OneDrive\Leo - Personal\Documents\fobes top 100"
-Copy-Item -Recurse -Force .\copy_into_repo\* $Repo
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
 ```
 
-Then open a terminal in the project root and run:
+macOS or Linux:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+## Verify the Installation
+
+Run the test suite:
 
 ```powershell
-codex --ask-for-approval never "Summarize the current instructions and list available skills/subagents for this Forbes project."
+.\.venv\Scripts\python.exe -m pytest
 ```
 
-## Verify the pack
-Inside the project root:
+On macOS or Linux:
+
+```bash
+python -m pytest
+```
+
+## Prepare a Target Year
+
+Create year-specific folders and blank manual-import templates:
 
 ```powershell
-python .\tools\validate_prompt_pack.py
+.\.venv\Scripts\python.exe -m src.pipeline --year 2026 --init-year
 ```
 
-Expected result: it prints `Prompt pack validation passed.`
+Do not run collection or analysis commands until your source data is ready and your source permissions are clear.
 
-## Suggested execution sequence
-1. Paste `prompts/00_MASTER_CODEX_PROMPT.md` into Codex from the project root.
-2. Ask Codex to spawn the subagents listed in `.codex/agents/`.
-3. Run the data pipeline first. Do not start 100 Word reports until `top100_2025.csv`, `source_citations.csv`, and growth metrics pass validation.
-4. Generate reports in batches of 5–10 people to avoid context blow-up and to improve citation QA.
-5. Run QA after every batch.
+## Manual-Import Workflow
 
-## Important limitation
-A prompt pack cannot bypass Forbes access controls. If Forbes blocks automated retrieval or requires a subscription, use the manual-import template and document the source fields supplied by the human researcher.
+If official annual data cannot be collected programmatically in a compliant way, populate the manual-import templates in a private local workspace:
+
+- `templates/manual_import_top100_2026.csv`
+- `templates/manual_import_wealth_history_2026.csv`
+- `templates/manual_import_source_citations_2026.csv`
+- `templates/manual_import_person_evidence_pack_2026.csv`
+
+Then run:
+
+```powershell
+.\.venv\Scripts\python.exe -m src.pipeline --year 2026 --manual-import
+```
+
+## Source and License Boundary
+
+The MIT License applies to this framework's code, documentation, blank templates, and synthetic samples. It does not include Forbes data, third-party source data, generated datasets, generated workbooks, generated charts, generated reports, or user-provided annual datasets.

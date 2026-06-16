@@ -157,7 +157,7 @@ def build_source_citations(
     successful_years: list[int],
     config: YearConfig | None = None,
 ) -> pd.DataFrame:
-    """Build AGENTS-grade field/claim citation rows from project data."""
+    """Build research-grade field/claim citation rows from project data."""
     config = config or get_year_config(DEFAULT_TARGET_YEAR)
     accessed_at = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     rows: list[dict[str, Any]] = []

@@ -85,7 +85,7 @@ ROUTING_ROWS = [
         "required_ownership_fields": "Beneficial ownership shares and percent; pledged shares; voting/control notes; option/award context; private-company ownership/valuation limits where available.",
         "required_charts": "Forbes wealth history; public-equity sensitivity; business empire map; segment economics where filings support it.",
         "default_confidence_level": "Medium-high when public-company filings support the core asset; medium/low for private optionality.",
-        "report_status_threshold": "AGENTS_grade_candidate",
+        "report_status_threshold": "research_grade_candidate",
         "template_reference_docx": "reports/people/001_elon-musk_business_analysis_enriched_v2.docx",
     },
     {
@@ -98,7 +98,7 @@ ROUTING_ROWS = [
         "required_ownership_fields": "Economic ownership; voting control; share classes; pledged shares; controlled-company status; trust/liquidity limitations.",
         "required_charts": "Forbes wealth history; market-cap sensitivity; platform/business empire map; segment economics or revenue mix chart.",
         "default_confidence_level": "High for filed financials and proxy control; medium for strategy synthesis and AI/option-value interpretation.",
-        "report_status_threshold": "AGENTS_grade_candidate",
+        "report_status_threshold": "research_grade_candidate",
         "template_reference_docx": "reports/people/002_mark-zuckerberg_business_analysis_enriched_v3.docx",
     },
     {
@@ -111,7 +111,7 @@ ROUTING_ROWS = [
         "required_ownership_fields": "Beneficial shares and percent; voting rights; executive chair/founder role; share-sale, trust, debt, tax, and private-asset limitations.",
         "required_charts": "Forbes wealth history; public-equity sensitivity; segment revenue/operating income; business empire map.",
         "default_confidence_level": "High for public Amazon evidence; medium-low for private assets such as Blue Origin unless primary valuation/ownership evidence exists.",
-        "report_status_threshold": "AGENTS_grade_candidate",
+        "report_status_threshold": "research_grade_candidate",
         "template_reference_docx": "reports/people/003_jeff-bezos_business_analysis_enriched_v3_clean.docx",
     },
     {
@@ -124,7 +124,7 @@ ROUTING_ROWS = [
         "required_ownership_fields": "Family group share capital; voting rights; controlling vehicles; intra-family allocation limits; succession/governance disclosures where available.",
         "required_charts": "Forbes wealth history; family-group sensitivity; luxury segment economics; portfolio/brand empire map.",
         "default_confidence_level": "High for group filings and family-control tables; medium/low for personal allocation, trusts, succession mechanics, and brand-level valuations.",
-        "report_status_threshold": "AGENTS_grade_candidate",
+        "report_status_threshold": "research_grade_candidate",
         "template_reference_docx": "reports/people/005_bernard-arnault-family_business_analysis_enriched_v2.docx",
     },
     {
@@ -137,7 +137,7 @@ ROUTING_ROWS = [
         "required_ownership_fields": "Beneficial shares and percent; exercisable options included; pledged shares; founder/chairman/CTO role; debt/trust/liquidity limitations.",
         "required_charts": "Forbes wealth history; Oracle market-cap sensitivity; Oracle segment economics; enterprise software/cloud empire map.",
         "default_confidence_level": "High for Oracle filing/proxy facts; medium for cloud/AI valuation interpretation and personal balance-sheet bridge.",
-        "report_status_threshold": "AGENTS_grade_candidate",
+        "report_status_threshold": "research_grade_candidate",
         "template_reference_docx": "reports/people/004_larry-ellison_business_analysis_enriched_v2.docx",
     },
 ]

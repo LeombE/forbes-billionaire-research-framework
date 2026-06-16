@@ -189,7 +189,7 @@ def run_quality_checks(
         {
             "check": "wealth_engine_categories_allowed",
             "status": "PASS" if metrics["wealth_engine_category"].isin(WEALTH_ENGINE_CATEGORIES).all() else "FAIL",
-            "detail": "Every wealth engine category is in the allowed AGENTS.md category list.",
+            "detail": "Every wealth engine category is in the allowed wealth engine category list.",
         },
         {
             "check": "source_citations_present",
@@ -199,7 +199,7 @@ def run_quality_checks(
         {
             "check": "source_citation_schema",
             "status": "PASS" if citation_columns_present else "FAIL",
-            "detail": "source_citations.csv contains the AGENTS-grade citation columns."
+            "detail": "source_citations.csv contains the research-grade citation columns."
             if citation_columns_present
             else "source_citations.csv is missing required citation columns.",
         },
