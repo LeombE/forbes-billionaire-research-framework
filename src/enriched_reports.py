@@ -1076,6 +1076,7 @@ def evidence_from_pack(pack: pd.DataFrame, existing_keys: set[str]) -> list[Evid
                 limitation=limitation,
                 confidence=clean(row.get("confidence_level")) or "Medium",
                 entity=clean(row.get("entity_or_asset")),
+                accessed_at=clean(row.get("accessed_at")) or "not recorded",
             )
         )
     return items
@@ -1086,27 +1087,28 @@ def build_evidence_items(context: EnrichedContext) -> list[EvidenceItem]:
     items = project_evidence(context)
     existing = {item.key for item in items}
     forbes_uri = clean(context.person.get("forbes_uri"))
-    if forbes_uri == "jeff-bezos":
+    use_legacy_gold_evidence = person_year(context.person) == 2025
+    if use_legacy_gold_evidence and forbes_uri == "jeff-bezos":
         for item in bezos_gold_evidence():
             if item.key not in existing:
                 items.append(item)
                 existing.add(item.key)
-    if forbes_uri == "elon-musk":
+    if use_legacy_gold_evidence and forbes_uri == "elon-musk":
         for item in elon_gold_evidence():
             if item.key not in existing:
                 items.append(item)
                 existing.add(item.key)
-    if forbes_uri == "mark-zuckerberg":
+    if use_legacy_gold_evidence and forbes_uri == "mark-zuckerberg":
         for item in mark_gold_evidence():
             if item.key not in existing:
                 items.append(item)
                 existing.add(item.key)
-    if forbes_uri == "bernard-arnault":
+    if use_legacy_gold_evidence and forbes_uri == "bernard-arnault":
         for item in arnault_gold_evidence():
             if item.key not in existing:
                 items.append(item)
                 existing.add(item.key)
-    if forbes_uri == "larry-ellison":
+    if use_legacy_gold_evidence and forbes_uri == "larry-ellison":
         for item in oracle_gold_evidence():
             if item.key not in existing:
                 items.append(item)
@@ -1290,13 +1292,26 @@ def create_charts(context: EnrichedContext, evidence: list[EvidenceItem], charts
     if clean(person.get("forbes_uri")) == "elon-musk":
         sens_path = charts_dir / f"{slug}_tesla_sensitivity_{variant}.png"
         deltas = list(range(-500, 501, 100))
-        exposure_2024 = 20.5
-        exposure_2025 = 19.8
+        proxy_text = " ".join(
+            context.evidence_pack[
+                context.evidence_pack["citation_key"].astype(str).str.casefold().eq("elon26_tsla_proxy_ownership")
+            ]
+            .astype(str)
+            .agg(" ".join, axis=1)
+            .tolist()
+        )
+        ownership_match = re.search(r"(\d+(?:\.\d+)?)\s*%", proxy_text)
+        exposure_2026 = float(ownership_match.group(1)) if ownership_match else 19.8
         fig, ax = plt.subplots(figsize=(8.2, 4.4), dpi=180)
         ax.axhline(0, color="#222222", linewidth=0.8)
         ax.axvline(0, color="#222222", linewidth=0.8)
-        ax.plot(deltas, [delta * exposure_2024 / 100 for delta in deltas], marker="o", label="20.5% 2024 proxy exposure", color="#d62728")
-        ax.plot(deltas, [delta * exposure_2025 / 100 for delta in deltas], marker="s", label="19.8% later 2025 proxy exposure", color="#9467bd")
+        ax.plot(
+            deltas,
+            [delta * exposure_2026 / 100 for delta in deltas],
+            marker="o",
+            label=f"{exposure_2026:.1f}% Tesla proxy beneficial ownership evidence",
+            color="#d62728",
+        )
         ax.set_title("Illustrative Tesla Market-Cap Sensitivity to Musk Wealth")
         ax.set_xlabel("Change in Tesla market capitalization, USD billions")
         ax.set_ylabel("Approx. change in Tesla-linked wealth, USD billions")
@@ -1304,7 +1319,7 @@ def create_charts(context: EnrichedContext, evidence: list[EvidenceItem], charts
         ax.legend(frameon=False, fontsize=8)
         ax.text(
             -490,
-            82,
+            max(delta * exposure_2026 / 100 for delta in deltas) * 0.72,
             "Illustrative only: excludes taxes, pledge terms,\noption exercise prices, discounts, debt, and liquidity.",
             fontsize=8,
             bbox={"boxstyle": "round,pad=0.35", "facecolor": "#f7f7f7", "edgecolor": "#bbbbbb"},
@@ -2915,6 +2930,132 @@ def add_generic_future_sections(doc: Document, context: EnrichedContext, evidenc
     add_confidence_note(doc, "Medium-low", "Reusable synthesis requires person-specific upgrade before research-grade publication.", evidence_keys)
 
 
+def add_elon_2026_draft_sections(doc: Document, context: EnrichedContext, evidence_keys: str) -> None:
+    """Add a 2026 evidence-pack-driven Elon Musk draft without reusing legacy sample prose."""
+    person = context.person
+    metric = context.metrics
+    year = person_year(person)
+    net_worth = money(person_net_worth(person))
+    tesla_keys = "[ELON26_TSLA_10K_BUSINESS][ELON26_TSLA_10K_REVENUE][ELON26_TSLA_10K_CASH_CAPEX][ELON26_TSLA_PROXY_OWNERSHIP]"
+    private_keys = "[ELON26_SPACEX_FALCON9_LOCATOR][ELON26_SPACEX_STARSHIP_LOCATOR][ELON26_STARLINK_LOCATOR][ELON26_PRIVATE_ASSET_GAP]"
+    xai_keys = "[ELON26_XAI_COMPANY_MISSION][ELON26_XAI_COLOSSUS_COMPUTE][ELON26_XAI_SERIES_E][ELON26_XAI_SPACEX_TRANSACTION]"
+    risk_keys = "[ELON26_TSLA_10K_RISK_KEY_PERSON][ELON26_TSLA_10K_RISK_CAPITAL][ELON26_TSLA_PROXY_PLEDGE_RESTRICTED][ELON26_PRIVATE_ASSET_GAP]"
+
+    doc.add_heading("6. Rank 1 2026 wealth equation", level=1)
+    add_para(
+        doc,
+        f"For {year}, the report should read Musk's {net_worth} Forbes estimate as an evidence-bound equation, not as cash in hand: "
+        "Forbes annual estimated net worth approximately equals Tesla public-equity exposure plus private-company and option-value assets, "
+        "minus unknown taxes, pledges, discounts, debt, trusts, and liquidity limits. The annual-list row identifies Tesla, SpaceX, and xAI as the source/assets, "
+        "while the strongest verified bridge in this draft is the Tesla proxy and Tesla public filing evidence [F1][ELON26_FORBES_ANNUAL_SEED][ELON26_TSLA_PROXY_OWNERSHIP].",
+    )
+    add_kv_table(
+        doc,
+        [
+            ("Canonical 2026 Forbes context", f"Rank {person_rank(person)}, {net_worth}, source/assets: {clean(person.get('source_of_wealth'))}"),
+            ("Visible public-equity engine", "Tesla beneficial ownership and market-cap sensitivity, supported by Tesla proxy and 10-K evidence."),
+            ("Private-company engine", "SpaceX and Starlink are material but currently limited to official source locators and unresolved ownership/valuation gaps."),
+            ("AI optionality", "xAI mission, funding, Colossus compute evidence, and SpaceX/xAI transaction context are sourced; personal wealth impact is not."),
+            ("Items not verified", "Musk personal taxes, trusts, debt terms, private liquidity, SpaceX/xAI valuation bridge, and full asset-level ownership."),
+        ],
+    )
+    add_confidence_note(doc, "Medium-high for Tesla; low to medium for private assets", "The equation separates verified public-company evidence from private-asset gaps.", "[F1][ELON26_FORBES_ANNUAL_SEED][ELON26_TSLA_PROXY_OWNERSHIP][ELON26_PRIVATE_ASSET_GAP]")
+
+    doc.add_heading("7. Tesla public-equity engine", level=1)
+    add_para(
+        doc,
+        "Tesla is the clearest evidence-supported wealth engine in this 2026 draft. The company filing supports the operating base: electric vehicles, "
+        "energy generation/storage, direct sales/service/charging infrastructure, and two reportable segments. The 2025 10-K evidence also supports "
+        "large operating scale: total 2025 revenue of $94.827B, automotive revenue of $69.526B, services and other revenue of $12.530B, and energy generation "
+        "and storage revenue of $12.771B. Operating cash flow was $14.747B, capital expenditures were $8.53B, and cash/cash equivalents plus investments were "
+        "$44.06B. These company-level economics support why Tesla equity can be a large public-market wealth engine, but they do not disclose Musk's personal "
+        f"cash liquidity or tax position {tesla_keys}.",
+    )
+    add_para(
+        doc,
+        "The proxy row is the key personal-link evidence: Tesla reported Musk beneficial ownership of 717,323,438 shares, or 19.8%, as of September 15, 2025. "
+        "This is useful for an illustrative market-cap sensitivity chart, but it is not a full net-worth model because beneficial ownership can include options, "
+        "pledges, restricted stock treatment, taxes, debt, and liquidity constraints [ELON26_TSLA_PROXY_OWNERSHIP][ELON26_TSLA_PROXY_PLEDGE_RESTRICTED].",
+    )
+    add_confidence_note(doc, "High for Tesla filing/proxy facts; medium for wealth interpretation", "The company facts are primary SEC evidence. Personal balance-sheet bridge remains incomplete.", tesla_keys)
+
+    doc.add_heading("8. SpaceX and Starlink private-company engine", level=1)
+    add_para(
+        doc,
+        "SpaceX and Starlink should be treated as a private-company engine with high potential importance and limited verified financial transparency in this draft. "
+        "Official SpaceX Falcon 9 and Starship pages and the Starlink site were captured as primary-source locators. They are not yet enough to claim exact SpaceX "
+        "valuation, revenue, margin, ownership percentage, or Musk personal wealth contribution. The report therefore uses SpaceX/Starlink as material strategic "
+        f"optionality, not as a precise private valuation bridge {private_keys}.",
+    )
+    add_para(
+        doc,
+        "The correct next evidence step is to add reliable primary or high-quality secondary support for private valuation marks, tender offers, ownership percentages, "
+        "Starlink business metrics, government/commercial contract economics, and any SpaceX/xAI transaction effects. Until those are collected, the draft should not "
+        "translate SpaceX or Starlink into a precise dollar attribution [ELON26_PRIVATE_ASSET_GAP].",
+    )
+    add_confidence_note(doc, "Low for valuation; medium for source locators", "Official locators establish where evidence can be reviewed, but not audited private-company economics.", private_keys)
+
+    doc.add_heading("9. xAI optionality and SpaceX transaction limits", level=1)
+    add_para(
+        doc,
+        "xAI is best handled as AI infrastructure optionality with explicit limits. Official xAI pages support the mission and product framing, while the Colossus page "
+        "supports a compute-infrastructure thesis. xAI official announcements support large private funding rounds, including the $20B Series E, and record a stated "
+        "SpaceX/xAI transaction. Those sources support strategic relevance; they do not disclose transaction valuation, exchange ratio, Musk personal ownership, revenue, "
+        f"profitability, or audited capital intensity {xai_keys}.",
+    )
+    add_confidence_note(doc, "Medium for company announcements; low for personal wealth attribution", "Official xAI evidence supports existence and strategic direction, not a complete valuation bridge.", xai_keys)
+
+    doc.add_heading("10. First-principles business analysis", level=1)
+    add_para(
+        doc,
+        "The scarce resources in this rank 1 draft are concentrated control over capital-intensive frontier platforms: electric vehicles and autonomy at Tesla, orbital "
+        "launch and satellite broadband at SpaceX/Starlink, and AI compute/model infrastructure at xAI. The public-market part is Tesla, where operating scale and proxy "
+        "ownership make the wealth bridge more visible. The private-market part is option-value heavy: SpaceX/Starlink and xAI may be strategically central, but the current "
+        "evidence does not support a precise personal net-worth attribution. Capital markets reward the strategy because each asset attacks a large bottleneck: transportation "
+        "electrification, launch cost and satellite connectivity, and AI compute/model access [ELON26_TSLA_10K_BUSINESS][ELON26_XAI_COLOSSUS_COMPUTE][ELON26_PRIVATE_ASSET_GAP].",
+    )
+    add_confidence_note(doc, "Medium", "This is synthesis from primary Tesla and xAI evidence plus explicit private-asset gaps.", "[ELON26_TSLA_10K_BUSINESS][ELON26_XAI_COLOSSUS_COMPUTE][ELON26_PRIVATE_ASSET_GAP]")
+
+    doc.add_heading("11. Risks and counter-thesis", level=1)
+    add_para(
+        doc,
+        "The counter-thesis is concentration and opacity. Tesla filing evidence supports key-person and capital-intensity risks; proxy evidence also flags pledged shares and "
+        "restricted-stock caveats. Private companies add valuation opacity, dilution uncertainty, illiquidity, and incomplete financial statement evidence. The 2026 rank 1 "
+        "report should therefore avoid treating the Forbes estimate as an audited sum-of-the-parts balance sheet [D1]"
+        f"{risk_keys}.",
+    )
+    add_confidence_note(doc, "High for Tesla risks; low for private balance-sheet risk quantification", "Risk factors are filing-supported where cited; private-asset risk remains partly unverified.", risk_keys)
+
+    doc.add_heading("12. Transferable business lessons", level=1)
+    add_bullets(
+        doc,
+        [
+            "Ownership concentration matters most when attached to assets that can scale into public or private capital-market narratives.",
+            "High-convexity bets work only when losses are survivable and upside is tied to large bottlenecks.",
+            "Public equity creates transparent wealth sensitivity; private assets create optionality but require stronger evidence before precise claims.",
+            "Vertical integration and infrastructure control can be a moat, but capital intensity and execution risk rise at the same time.",
+            "Narrative alone is not enough for this report: each lesson should remain tied to filing evidence, official company evidence, or an explicit evidence gap.",
+        ],
+    )
+    add_confidence_note(doc, "Medium", "Lessons are analytical synthesis; they remain draft-level until SpaceX/xAI financial and ownership evidence is stronger.", "[ELON26_TSLA_10K_CASH_CAPEX][ELON26_XAI_COLOSSUS_COMPUTE][ELON26_PRIVATE_ASSET_GAP]")
+
+    doc.add_heading("13. Rank 1 evidence gaps and confidence notes", level=1)
+    add_matrix_table(
+        doc,
+        ["Gap", "Current confidence", "Treatment in this draft"],
+        [
+            ["SpaceX exact valuation / ownership / financials", "Low", "Discuss as important private-company engine, not a precise dollar bridge."],
+            ["Starlink revenue, margin, subscriber economics, and valuation", "Low", "Use official locator only until quantitative evidence is collected."],
+            ["xAI / SpaceX transaction valuation and personal wealth impact", "Low", "Treat transaction existence as sourced; do not infer personal wealth effect."],
+            ["Musk personal taxes, trusts, debt, liquidity, and full pledge terms", "Low", "List as missing personal balance-sheet evidence."],
+            ["Forbes profile URL", "Low", "Profile URL is unavailable in processed 2026 data; annual list source remains canonical for rank/net worth."],
+            ["Tesla public filings and proxy ownership facts", "High", "Use for company economics, ownership bridge, and risk framing."],
+        ],
+        font_size=8,
+    )
+    add_confidence_note(doc, "High for explicit gap handling", "The draft intentionally blocks unsupported claims from being promoted to final conclusions.", "[F1][F2][ELON26_PRIVATE_ASSET_GAP]")
+
+
 def add_appendices(doc: Document, evidence: list[EvidenceItem]) -> None:
     doc.add_section(WD_SECTION.NEW_PAGE)
     doc.add_heading("Evidence appendix", level=1)
@@ -3044,6 +3185,8 @@ def create_enriched_report(
         add_arnault_specific_sections(doc, context, charts)
     elif config.legacy_layout and forbes_uri == "larry-ellison":
         add_ellison_specific_sections(doc, context, charts)
+    elif not config.legacy_layout and forbes_uri == "elon-musk" and not context.evidence_pack.empty:
+        add_elon_2026_draft_sections(doc, context, evidence_keys)
     else:
         add_generic_future_sections(doc, context, evidence_keys)
     if charts and (not config.legacy_layout or forbes_uri not in {"jeff-bezos", "mark-zuckerberg", "bernard-arnault", "larry-ellison"}):
@@ -3086,7 +3229,7 @@ def extract_docx_validation(
             break
         body_parts.append(paragraph.text)
     body_text = "\n".join(body_parts)
-    body_keys = sorted(set(re.findall(r"\[([A-Z][0-9A-Z]*)\]", body_text)))
+    body_keys = sorted(set(re.findall(r"\[([A-Z][0-9A-Z_]*)\]", body_text)))
     appendix_keys: set[str] = set()
     evidence_rows = 0
     for table in doc.tables:
@@ -3110,14 +3253,14 @@ def extract_docx_validation(
         if paragraph.style.name.startswith("Heading 1") and text:
             if current_heading:
                 joined = "\n".join(current_text)
-                section_results[current_heading] = bool(re.search(r"\[[A-Z][0-9A-Z]*\]", joined) or "Confidence note:" in joined)
+                section_results[current_heading] = bool(re.search(r"\[[A-Z][0-9A-Z_]*\]", joined) or "Confidence note:" in joined)
             current_heading = text
             current_text = []
         elif current_heading:
             current_text.append(text)
     if current_heading:
         joined = "\n".join(current_text)
-        section_results[current_heading] = bool(re.search(r"\[[A-Z][0-9A-Z]*\]", joined) or "Confidence note:" in joined)
+        section_results[current_heading] = bool(re.search(r"\[[A-Z][0-9A-Z_]*\]", joined) or "Confidence note:" in joined)
 
     status = report_status or infer_report_status(path)
     valid_report_status = status in REPORT_STATUS_VALUES
