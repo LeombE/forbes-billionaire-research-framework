@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 import math
+import subprocess
 from pathlib import Path
 
 import pandas as pd
@@ -12,6 +13,9 @@ from src.enriched_reports import create_enriched_report, generate_enriched_repor
 from src.fetch_forbes import ForbesAnnualFetcher
 from src.metrics import calculate_growth_metrics
 from src.pipeline import run_pipeline
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_2026_year_config_paths_do_not_overlap_2025_outputs() -> None:
@@ -133,11 +137,53 @@ def test_2026_manual_import_templates_and_dirs_are_ready() -> None:
         assert not missing, f"{path} missing {missing}"
 
 
-def test_2026_infrastructure_has_no_generated_annual_outputs_or_docx() -> None:
+def _assert_git_ignored(path: Path) -> None:
+    result = subprocess.run(
+        ["git", "check-ignore", "-q", str(path.as_posix())],
+        cwd=ROOT,
+        check=False,
+    )
+    assert result.returncode == 0, f"{path} is not ignored by Git"
+
+
+def test_2026_generated_outputs_are_local_private_when_present() -> None:
     cfg = get_year_config(2026)
-    assert not cfg.top100_path.exists()
-    assert not cfg.history_path.exists()
-    assert not cfg.metrics_path.exists()
-    assert not cfg.citations_path.exists()
-    assert not cfg.workbook_path.exists()
-    assert list(cfg.people_reports_dir.glob("*.docx")) == []
+    generated_paths = [
+        cfg.top100_path,
+        cfg.history_path,
+        cfg.metrics_path,
+        cfg.citations_path,
+        cfg.person_quality_path,
+        cfg.workbook_path,
+        cfg.charts_dir / "example.png",
+        cfg.people_reports_dir / "example.docx",
+        Path("data/private/2026/manual_import_top100_2026.csv"),
+    ]
+    for path in generated_paths:
+        _assert_git_ignored(path)
+
+    for template_name in [
+        "manual_import_top100_2026.csv",
+        "manual_import_wealth_history_2026.csv",
+        "manual_import_source_citations_2026.csv",
+        "manual_import_person_evidence_pack_2026.csv",
+    ]:
+        assert pd.read_csv(Path("templates") / template_name).empty
+
+    searchable_paths = [
+        path
+        for path in [
+            cfg.top100_path,
+            cfg.history_path,
+            cfg.metrics_path,
+            cfg.citations_path,
+            cfg.person_quality_path,
+            Path("data/private/2026/manual_import_top100_2026.csv"),
+            Path("data/private/2026/manual_import_wealth_history_2026.csv"),
+            Path("data/private/2026/manual_import_source_citations_2026.csv"),
+        ]
+        if path.exists()
+    ]
+    text = "\n".join(path.read_text(encoding="utf-8", errors="ignore") for path in searchable_paths)
+    assert "real-time" not in text.casefold()
+    assert "realtime" not in text.casefold()
